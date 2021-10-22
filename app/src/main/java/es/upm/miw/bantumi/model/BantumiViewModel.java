@@ -23,27 +23,14 @@ public class BantumiViewModel extends ViewModel {
         }
     }
 
-    /**
-     * @return Devuelve el turno actual
-     */
     public LiveData<JuegoBantumi.Turno> getTurno() {
         return turno;
     }
 
-    /**
-     * Establece el valor para turno
-     * @param turno valor
-     */
     public void setTurno(JuegoBantumi.Turno turno) {
         this.turno.setValue(turno);
     }
 
-    /**
-     * Recupera el valor de una determinada posición
-     *
-     * @param pos posición
-     * @return contenido de la posición <i>pos</i>
-     */
     @NonNull
     public LiveData<Integer> getNumSemillas(int pos) {
         if (pos < 0 || pos >= JuegoBantumi.NUM_POSICIONES) {
@@ -53,12 +40,6 @@ public class BantumiViewModel extends ViewModel {
         return tablero.get(pos);
     }
 
-    /**
-     * Asigna el valor v a la posición pos del tablero
-     *
-     * @param pos índice
-     * @param v valor
-     */
     public void setNumSemillas(int pos, int v) {
         if (pos < 0 || pos >= JuegoBantumi.NUM_POSICIONES) {
             throw new ArrayIndexOutOfBoundsException();

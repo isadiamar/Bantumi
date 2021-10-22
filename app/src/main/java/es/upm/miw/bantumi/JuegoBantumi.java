@@ -7,29 +7,14 @@ import es.upm.miw.bantumi.model.BantumiViewModel;
 public class JuegoBantumi {
 
     public static final int NUM_POSICIONES = 14;
-    // Posiciones 0-5: campo jugador 1
-    // Posición 6: depósito jugador 1
-    // Posiciones 7-12: campo jugador 2
-    // Posición 13: depósito jugador 2
 
     private final BantumiViewModel bantumiVM;
+    private final int numInicialSemillas;
 
-    // Turno juego
     public enum Turno {
         turnoJ1, turnoJ2, Turno_TERMINADO
     }
 
-    // Número inicial de semillas
-    private final int numInicialSemillas;
-
-    /**
-     * Constructor
-     *
-     * Inicializa el modelo sólo si éste está vacío
-     *
-     * @param turno especifica el turno inicial <code>[Turno.turnoJ1 || Turno.turnoJ2]</code>
-     * @param numInicialSemillas Número de semillas al inicio del juego
-     */
     public JuegoBantumi(BantumiViewModel bantumiVM, Turno turno, int numInicialSemillas) {
         this.bantumiVM = bantumiVM;
         this.numInicialSemillas = numInicialSemillas;
@@ -38,29 +23,14 @@ public class JuegoBantumi {
         }
     }
 
-    /**
-     * @param pos posición
-     * @return Número de semillas en el hueco <i>pos</i>
-     */
     public int getSemillas(int pos) {
         return bantumiVM.getNumSemillas(pos).getValue();
     }
 
-    /**
-     * Asigna el número de semillas a una posición
-     *
-     * @param pos posición
-     * @param valor número de semillas
-     */
     public void setSemillas(int pos, int valor) {
         bantumiVM.setNumSemillas(pos, valor);
     }
 
-    /**
-     * Inicializa el estado del juego (almacenes vacíos y campos con semillas)
-     *
-     * @param turno especifica el turno inicial <code>[Turno.turnoJ1 || Turno.turnoJ2]</code>
-     */
     public void inicializar(Turno turno) {
         setTurno(turno);
         for (int i = 0; i < NUM_POSICIONES; i++)
@@ -72,11 +42,6 @@ public class JuegoBantumi {
             );
     }
 
-    /**
-     * Recoge las semillas en <i>pos</i> y realiza la siembra
-     *
-     * @param pos posición escogida [0..13]
-     */
     public void jugar(int pos) {
         if (pos < 0 || pos >= NUM_POSICIONES)
             throw new IndexOutOfBoundsException(String.format("Posición (%d) fuera de límites", pos));
@@ -135,17 +100,10 @@ public class JuegoBantumi {
         Log.i("MiW", "\t turno = " + turnoActual());
     }
 
-    /**
-     * @return Indica si el juego ha finalizado (todas las semillas están en los depósitos)
-     */
     public boolean juegoTerminado() {
         return (turnoActual() == Turno.Turno_TERMINADO);
     }
 
-    /**
-     * @param turno Turno
-     * @return Determina si el campo del jugador especificado por <i>turno</i> está vacío
-     */
     private boolean campoVacio(Turno turno) {
         boolean vacio = true;
         int inicioCampo = (turno == Turno.turnoJ1) ? 0 : 7;
@@ -155,11 +113,6 @@ public class JuegoBantumi {
         return vacio;
     }
 
-    /**
-     * Recolecta las semillas del campo que empieza en <i>pos</i> en su depósito (<i>pos + 6</i>)
-     *
-     * @param pos Posición de inicio del campo
-     */
     private void recolectar(int pos) {
         int semillasAlmacen = getSemillas(pos + 6);
         for (int i = pos; i < pos + 6; i++) {
@@ -170,18 +123,10 @@ public class JuegoBantumi {
         Log.i("MiW", "\tRecolectar - " + pos);
     }
 
-    /**
-     * @return turno actual
-     */
     public Turno turnoActual() {
         return bantumiVM.getTurno().getValue();
     }
 
-    /**
-     * Establece el turno
-     *
-     * @param turno
-     */
     public void setTurno(Turno turno) {
         bantumiVM.setTurno(turno);
     }

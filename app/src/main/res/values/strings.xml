@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Bantumi</string>
 
-    <string name="txtPlayer1">Jugador 1</string>
-    <string name="txtPlayer2">Jugador 2</string>
+    <string name="txtPlayer1">Player 1</string>
+    <string name="txtPlayer2">Player 2</string>
     <string name="txtBtnReset">Reset</string>
 
     <!-- Valores del juego -->

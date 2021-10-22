@@ -8,7 +8,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginTop="20dp"
+       >
 
         <TextView
             android:id="@+id/tvPlayer2"
@@ -17,7 +19,8 @@
             android:text="@string/txtPlayer2"
             android:textAlignment="center"
             android:padding="16dp"
-            android:textSize="24sp" />
+            android:textSize="20sp"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,7 +38,7 @@
                 android:paddingBottom="24dp"
                 android:maxLines="1"
                 android:text="@string/txtInitialScore"
-                android:textColor="@color/teal_700"
+                android:textColor="@color/blue_violet"
                 android:textSize="56sp"
                 android:textStyle="bold" />
 
@@ -49,7 +52,8 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    >
 
                     <Button
                         android:id="@+id/casilla_12"
@@ -87,7 +91,8 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp">
 
                     <Button
                         android:id="@+id/casilla_00"
@@ -128,7 +133,7 @@
                 android:paddingBottom="24dp"
                 android:maxLines="1"
                 android:text="@string/txtInitialScore"
-                android:textColor="@color/teal_700"
+                android:textColor="@color/blue_violet"
                 android:textSize="56sp"
                 android:textStyle="bold" />
 
@@ -141,7 +146,7 @@
             android:text="@string/txtPlayer1"
             android:textAlignment="center"
             android:padding="16dp"
-            android:textSize="24sp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
     <Button
@@ -151,6 +156,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="32dp"
+        android:padding="15dp"
         android:text="@string/txtBtnReset"
-        android:textColor="@color/black" />
+        android:textColor="@color/white"
+        />
 </RelativeLayout>
