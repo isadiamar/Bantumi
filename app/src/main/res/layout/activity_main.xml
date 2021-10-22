@@ -19,7 +19,7 @@
             android:text="@string/txtPlayer2"
             android:textAlignment="center"
             android:padding="16dp"
-            android:textSize="20sp"
+            android:textSize="22sp"
             />
 
         <LinearLayout
@@ -39,7 +39,7 @@
                 android:maxLines="1"
                 android:text="@string/txtInitialScore"
                 android:textColor="@color/blue_violet"
-                android:textSize="56sp"
+                android:textSize="52sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -134,7 +134,7 @@
                 android:maxLines="1"
                 android:text="@string/txtInitialScore"
                 android:textColor="@color/blue_violet"
-                android:textSize="56sp"
+                android:textSize="52sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -146,11 +146,12 @@
             android:text="@string/txtPlayer1"
             android:textAlignment="center"
             android:padding="16dp"
-            android:textSize="20sp" />
+            android:textSize="22sp"
+            />
     </LinearLayout>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/buttonReset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -158,6 +159,5 @@
         android:layout_marginBottom="32dp"
         android:padding="15dp"
         android:text="@string/txtBtnReset"
-        android:textColor="@color/white"
-        />
+        android:textColor="@color/white" />
 </RelativeLayout>

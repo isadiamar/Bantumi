@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,23 +20,37 @@ import java.util.Locale;
 
 import es.upm.miw.bantumi.model.BantumiViewModel;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     protected final String LOG_TAG = "MiW";
     JuegoBantumi juegoBantumi;
     BantumiViewModel bantumiVM;
     int numInicialSemillas;
+    Button bttnReset;
+
+    @Override
+    public void onClick(View v) {
+        if (v.equals(bttnReset)) {
+            new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Instancia el ViewModel y el juego, y asigna observadores a los huecos
         numInicialSemillas = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
         juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turno.turnoJ1, numInicialSemillas);
         crearObservadores();
+
+        reset();
+    }
+
+    private void reset(){
+        bttnReset= findViewById(R.id.buttonReset);
+        bttnReset.setOnClickListener(this);
     }
 
     /**
@@ -47,21 +62,11 @@ public class MainActivity extends AppCompatActivity {
             int finalI = i;
             bantumiVM.getNumSemillas(i).observe(    // Huecos y almacenes
                     this,
-                    new Observer<Integer>() {
-                        @Override
-                        public void onChanged(Integer integer) {
-                            mostrarValor(finalI, juegoBantumi.getSemillas(finalI));
-                        }
-                    });
+                    numSemillas -> mostrarValor(finalI, juegoBantumi.getSemillas(finalI)));
         }
         bantumiVM.getTurno().observe(   // Turno
                 this,
-                new Observer<JuegoBantumi.Turno>() {
-                    @Override
-                    public void onChanged(JuegoBantumi.Turno turno) {
-                        marcarTurno(juegoBantumi.turnoActual());
-                    }
-                }
+                turno -> marcarTurno(juegoBantumi.turnoActual())
         );
     }
 
@@ -75,12 +80,12 @@ public class MainActivity extends AppCompatActivity {
         TextView tvJugador2 = findViewById(R.id.tvPlayer2);
         switch (turnoActual) {
             case turnoJ1:
-                tvJugador1.setTextColor(getColor(R.color.design_default_color_primary));
+                tvJugador1.setTextColor(getColor(R.color.blue_violet));
                 tvJugador2.setTextColor(getColor(R.color.black));
                 break;
             case turnoJ2:
                 tvJugador1.setTextColor(getColor(R.color.black));
-                tvJugador2.setTextColor(getColor(R.color.design_default_color_primary));
+                tvJugador2.setTextColor(getColor(R.color.pink_200));
                 break;
             default:
                 tvJugador1.setTextColor(getColor(R.color.black));
@@ -88,12 +93,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Muestra el valor <i>valor</i> en la posición <i>pos</i>
-     *
-     * @param pos posición a actualizar
-     * @param valor valor a mostrar
-     */
     private void mostrarValor(int pos, int valor) {
         String num2digitos = String.format(Locale.getDefault(), "%02d", pos);
         // Los identificadores de los huecos tienen el formato casilla_XX
@@ -135,11 +134,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Acción que se ejecuta al pulsar sobre un hueco
-     *
-     * @param v Vista pulsada (hueco)
-     */
     public void huecoPulsado(@NonNull View v) {
         String resourceName = getResources().getResourceEntryName(v.getId()); // pXY
         int num = Integer.parseInt(resourceName.substring(resourceName.length() - 2));
@@ -192,4 +186,5 @@ public class MainActivity extends AppCompatActivity {
         // @TODO guardar puntuación
         new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
     }
+
 }
