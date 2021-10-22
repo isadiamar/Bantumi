@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="1dp"
        >
 
         <TextView
@@ -92,7 +92,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp">
+                    android:layout_marginTop="2dp">
 
                     <Button
                         android:id="@+id/casilla_00"
@@ -147,6 +147,7 @@
             android:textAlignment="center"
             android:padding="16dp"
             android:textSize="22sp"
+            android:layout_marginBottom="5dp"
             />
     </LinearLayout>
 
