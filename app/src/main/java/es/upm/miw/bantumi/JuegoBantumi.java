@@ -20,7 +20,6 @@ public class JuegoBantumi {
         }
     }
 
-
     public int getSeeds(int pos) {
         return bantumiVM.getNumSeeds(pos).getValue();
     }
@@ -141,35 +140,31 @@ public class JuegoBantumi {
         String board = serializedGame.substring(2);
         Turn turn = deserializeTurn(turnOrdinal);
         deserializeBoard(board);
-
-
         bantumiVM.setTurn(turn);
-
     }
 
     public Turn deserializeTurn(int turnOrdinal) {
-        Turn turno = Turn.Turn_Ended;
+        Turn turn = Turn.Turn_Ended;
 
-        for (Turn turn : Turn.values()) {
-            if (turn.ordinal() == turnOrdinal) {
-                turno = turn;
+        for (Turn t : Turn.values()) {
+            if (t.ordinal() == turnOrdinal) {
+                turn = t;
             }
         }
-        return turno;
+        return turn;
     }
 
     public void deserializeBoard(String board) {
         int value;
         int pos = 0;
+
         for (int i = 0; i < board.length(); i++) {
             if (board.charAt(i) != ',' && board.charAt(i) != '\n') {
                 value = Integer.parseInt(board.substring(i, i + 1));
                 bantumiVM.setNumSeeds(pos, value);
                 pos++;
             }
-
         }
-
     }
 
     public enum Turn {

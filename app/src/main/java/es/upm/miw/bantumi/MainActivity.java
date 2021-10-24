@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
 
-        if (v.equals(buttonReset) ) {
+        if (v.equals(buttonReset)) {
             new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
         }
     }
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initialNumberSeeds = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
         juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turn.turnJ1, initialNumberSeeds);
+
         createObservers();
         reset();
     }
@@ -171,12 +172,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void save(View v) {
-        String batumiSerialized = this.juegoBantumi.serializeGame();
+        String bantumiSerialized = this.juegoBantumi.serializeGame();
         FileOutputStream fos = null;
 
         try {
             fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
-            fos.write(batumiSerialized.getBytes());
+            fos.write(bantumiSerialized.getBytes());
 
             Toast.makeText(MainActivity.this, "Saved ", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
@@ -240,18 +241,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /**
-     * Elige una posición aleatoria del campo del jugador2 y realiza la siembra
-     * Si mantiene turno -> vuelve a jugar
-     */
     void playComputer() {
         while (juegoBantumi.currentTurn() == JuegoBantumi.Turn.turnJ2) {
-            int pos = 7 + (int) (Math.random() * 6);    // posición aleatoria
-            Log.i(LOG_TAG, "juegaComputador(), pos=" + pos);
+            int pos = 7 + (int) (Math.random() * 6);    // pos random
+            Log.i(LOG_TAG, "playComputer(), pos=" + pos);
             if (juegoBantumi.getSeeds(pos) != 0 && (pos < 13)) {
                 juegoBantumi.play(pos);
             } else {
-                Log.i(LOG_TAG, "\t posición vacía");
+                Log.i(LOG_TAG, "\t empty position");
             }
         }
     }
