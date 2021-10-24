@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v.equals(buttonReset)) {
+
+        if (v.equals(buttonReset) ) {
             new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
         }
-
     }
 
     @Override
@@ -135,9 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         switch (item.getItemId()) {
-//            case R.id.opcAjustes: // @todo Preferencias
-//                startActivity(new Intent(this, BantumiPrefs.class));
-//                return true;
+//
             case R.id.opcAcercaDe:
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.aboutTitle)
@@ -156,6 +154,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.opcAjustes:
                 editPreferences(findViewById(R.id.opcAjustes));
+                return true;
+
+            case R.id.opcReiniciarPartida:
+                new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
                 return true;
 
             default:
