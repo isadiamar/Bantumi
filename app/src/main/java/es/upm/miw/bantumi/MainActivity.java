@@ -97,27 +97,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         );
     }
 
-    private void highlightTurn(@NonNull JuegoBantumi.Turn turnoActual) {
-        TextView tvJugador1 = findViewById(R.id.tvPlayer1);
-        TextView tvJugador2 = findViewById(R.id.tvPlayer2);
-        switch (turnoActual) {
+    private void highlightTurn(@NonNull JuegoBantumi.Turn currentTurn) {
+        TextView tvPlayer1 = findViewById(R.id.tvPlayer1);
+        TextView tvPlayer2 = findViewById(R.id.tvPlayer2);
+        switch (currentTurn) {
             case turnJ1:
-                tvJugador1.setTextColor(getColor(R.color.blue_violet));
-                tvJugador2.setTextColor(getColor(R.color.black));
+                tvPlayer1.setTextColor(getColor(R.color.blue_violet));
+                tvPlayer2.setTextColor(getColor(R.color.black));
                 break;
             case turnJ2:
-                tvJugador1.setTextColor(getColor(R.color.black));
-                tvJugador2.setTextColor(getColor(R.color.pink_200));
+                tvPlayer1.setTextColor(getColor(R.color.black));
+                tvPlayer2.setTextColor(getColor(R.color.pink_200));
                 break;
             default:
-                tvJugador1.setTextColor(getColor(R.color.black));
-                tvJugador2.setTextColor(getColor(R.color.black));
+                tvPlayer1.setTextColor(getColor(R.color.black));
+                tvPlayer2.setTextColor(getColor(R.color.black));
         }
     }
 
     private void showValue(int pos, int valor) {
         String num2digitos = String.format(Locale.getDefault(), "%02d", pos);
-        // Los identificadores de los huecos tienen el formato casilla_XX
+
         int idBoton = getResources().getIdentifier("casilla_" + num2digitos, "id", getPackageName());
         if (0 != idBoton) {
             TextView viewHueco = findViewById(idBoton);
