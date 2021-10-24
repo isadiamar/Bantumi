@@ -4,148 +4,176 @@ import android.util.Log;
 
 import es.upm.miw.bantumi.model.BantumiViewModel;
 
+
 public class JuegoBantumi {
 
-    public static final int NUM_POSICIONES = 14;
+    public static final int NUM_POS = 14;
 
     private final BantumiViewModel bantumiVM;
-    private final int numInicialSemillas;
+    private final int initialNumberSeeds;
 
-    public enum Turno {
-        turnoJ1, turnoJ2, Turno_TERMINADO
-    }
-
-    public JuegoBantumi(BantumiViewModel bantumiVM, Turno turno, int numInicialSemillas) {
+    public JuegoBantumi(BantumiViewModel bantumiVM, Turn turn, int initialNumberSeeds) {
         this.bantumiVM = bantumiVM;
-        this.numInicialSemillas = numInicialSemillas;
-        if (campoVacio(Turno.turnoJ1) && campoVacio(Turno.turnoJ2)) { // Inicializa sólo si está vacío!!!
-            inicializar(turno);
+        this.initialNumberSeeds = initialNumberSeeds;
+        if (emptyBox(Turn.turnJ1) && emptyBox(Turn.turnJ2)) { // Inicializa sólo si está vacío!!!
+            initialize(turn);
         }
     }
 
-    public int getSemillas(int pos) {
-        return bantumiVM.getNumSemillas(pos).getValue();
+    public int getSeeds(int pos) {
+        return bantumiVM.getNumSeeds(pos).getValue();
     }
 
-    public void setSemillas(int pos, int valor) {
-        bantumiVM.setNumSemillas(pos, valor);
+    public void setSeeds(int pos, int value) {
+        bantumiVM.setNumSeeds(pos, value);
     }
 
-    public void inicializar(Turno turno) {
-        setTurno(turno);
-        for (int i = 0; i < NUM_POSICIONES; i++)
-            setSemillas(
+    public void initialize(Turn turn) {
+        setTurn(turn);
+        for (int i = 0; i < NUM_POS; i++)
+            setSeeds(
                     i,
                     (i == 6 || i == 13) // Almacén??
                             ? 0
-                            : numInicialSemillas
+                            : initialNumberSeeds
             );
     }
 
-    public void jugar(int pos) {
-        if (pos < 0 || pos >= NUM_POSICIONES)
+    public void play(int pos) {
+        if (pos < 0 || pos >= NUM_POS)
             throw new IndexOutOfBoundsException(String.format("Posición (%d) fuera de límites", pos));
-        if (getSemillas(pos) == 0
-                || (pos < 6 && turnoActual() != Turno.turnoJ1)
-                || (pos > 6 && turnoActual() != Turno.turnoJ2)
+        if (getSeeds(pos) == 0
+                || (pos < 6 && currentTurn() != Turn.turnJ1)
+                || (pos > 6 && currentTurn() != Turn.turnJ2)
         )
             return;
-        Log.i("MiW", String.format("jugar(%02d)", pos));
+        Log.i("MiW", String.format("play(%02d)", pos));
 
-        // Recoger semillas en posición pos
-        int nSemillasHueco, numSemillas = getSemillas(pos);
-        setSemillas(pos, 0);
+        // Collect seeds in pos position
+        int numSeedsInBox, numSeeds = getSeeds(pos);
+        setSeeds(pos, 0);
 
-        // Realizar la siembra
+        // Do the seeding
         int nextPos = pos;
-        while (numSemillas > 0) {
-            nextPos = (nextPos + 1) % NUM_POSICIONES;
-            if (turnoActual() == Turno.turnoJ1 && nextPos == 13) // J1 salta depósito jugador 2
+        while (numSeeds > 0) {
+            nextPos = (nextPos + 1) % NUM_POS;
+            if (currentTurn() == Turn.turnJ1 && nextPos == 13) // J1 salta depósito jugador 2
                 nextPos = 0;
-            if (turnoActual() == Turno.turnoJ2 && nextPos == 6) // J2 salta depósito jugador 1
+            if (currentTurn() == Turn.turnJ2 && nextPos == 6) // J2 salta depósito jugador 1
                 nextPos = 7;
-            nSemillasHueco = getSemillas(nextPos);
-            setSemillas(nextPos, nSemillasHueco + 1);
-            numSemillas--;
+            numSeedsInBox = getSeeds(nextPos);
+            setSeeds(nextPos, numSeedsInBox + 1);
+            numSeeds--;
         }
 
         // Si acaba en hueco vacío en propio campo -> recoger propio + contrario
-        if (getSemillas(nextPos) == 1
-                && ((turnoActual() == Turno.turnoJ1 && nextPos < 6)
-                    || (turnoActual() == Turno.turnoJ2 && nextPos > 6 && nextPos < 13))
+        if (getSeeds(nextPos) == 1
+                && ((currentTurn() == Turn.turnJ1 && nextPos < 6)
+                || (currentTurn() == Turn.turnJ2 && nextPos > 6 && nextPos < 13))
         ) {
             int posContrario = 12 - nextPos;
-            Log.i("MiW", "\trecoger: turno=" + turnoActual() + ", pos=" + nextPos + ", contrario=" + posContrario);
-            int miAlmacen = (turnoActual() == Turno.turnoJ1) ? 6 : 13;
-            setSemillas(
+            Log.i("MiW", "\trecoger: turno=" + currentTurn() + ", pos=" + nextPos + ", contrario=" + posContrario);
+            int miAlmacen = (currentTurn() == Turn.turnJ1) ? 6 : 13;
+            setSeeds(
                     miAlmacen,
-                    1 + getSemillas(miAlmacen) + getSemillas(posContrario)
+                    1 + getSeeds(miAlmacen) + getSeeds(posContrario)
             );
-            setSemillas(nextPos, 0);
-            setSemillas(posContrario, 0);
+            setSeeds(nextPos, 0);
+            setSeeds(posContrario, 0);
         }
 
         // Si es fin -> recolectar
-        if (campoVacio(Turno.turnoJ1) || campoVacio(Turno.turnoJ2)) {
+        if (emptyBox(Turn.turnJ1) || emptyBox(Turn.turnJ2)) {
             recolectar(0);
             recolectar(7);
-            setTurno(Turno.Turno_TERMINADO);
+            setTurn(Turn.Turn_Ended);
         }
 
         // Determinar turno siguiente (si es depósito propio -> repite turno)
-        if (turnoActual() == Turno.turnoJ1 && nextPos != 6)
-            setTurno(Turno.turnoJ2);
-        else if (turnoActual() == Turno.turnoJ2 && nextPos != 13)
-            setTurno(Turno.turnoJ1);
-        Log.i("MiW", "\t turno = " + turnoActual());
+        if (currentTurn() == Turn.turnJ1 && nextPos != 6)
+            setTurn(Turn.turnJ2);
+        else if (currentTurn() == Turn.turnJ2 && nextPos != 13)
+            setTurn(Turn.turnJ1);
+        Log.i("MiW", "\t turno = " + currentTurn());
     }
 
-    public boolean juegoTerminado() {
-        return (turnoActual() == Turno.Turno_TERMINADO);
+    public boolean gameIsEnded() {
+        return (currentTurn() == Turn.Turn_Ended);
     }
 
-    private boolean campoVacio(Turno turno) {
+    private boolean emptyBox(Turn turn) {
         boolean vacio = true;
-        int inicioCampo = (turno == Turno.turnoJ1) ? 0 : 7;
+        int inicioCampo = (turn == Turn.turnJ1) ? 0 : 7;
         for (int i = inicioCampo; i < inicioCampo + 6; i++)
-            vacio = vacio && (getSemillas(i) == 0);
+            vacio = vacio && (getSeeds(i) == 0);
 
         return vacio;
     }
 
     private void recolectar(int pos) {
-        int semillasAlmacen = getSemillas(pos + 6);
+        int semillasAlmacen = getSeeds(pos + 6);
         for (int i = pos; i < pos + 6; i++) {
-            semillasAlmacen += getSemillas(i);
-            setSemillas(i, 0);
+            semillasAlmacen += getSeeds(i);
+            setSeeds(i, 0);
         }
-        setSemillas(pos + 6, semillasAlmacen);
+        setSeeds(pos + 6, semillasAlmacen);
         Log.i("MiW", "\tRecolectar - " + pos);
     }
 
-    public Turno turnoActual() {
-        return bantumiVM.getTurno().getValue();
+    public Turn currentTurn() {
+        return bantumiVM.getTurn().getValue();
     }
 
-    public void setTurno(Turno turno) {
-        bantumiVM.setTurno(turno);
+    public void setTurn(Turn turn) {
+        bantumiVM.setTurn(turn);
     }
 
-    /**
-     * Devuelve una cadena que representa el estado completo del juego
-     *
-     * @return juego serializado
-     */
-    public String serializa() {
-return null;
+    public String serializeGame() {
+        String board = bantumiVM.boardToString();
+        int turn = currentTurn().ordinal();
+
+        return turn + ";" + board;
     }
 
-    /**
-     * Recupera el estado del juego a partir de su representación
-     *
-     * @param juegoSerializado cadena que representa el estado completo del juego
-     */
-    public void deserializa(String juegoSerializado) {
-        // @TODO
+    public void deserializeGame(String serializedGame) {
+        int turnOrdinal = Integer.parseInt(serializedGame.substring(0, 1));
+        String board = serializedGame.substring(2);
+        Turn turn = deserializeTurn(turnOrdinal);
+        deserializeBoard(board);
+
+
+        bantumiVM.setTurn(turn);
+
     }
+
+    public Turn deserializeTurn(int turnOrdinal) {
+        Turn turno = Turn.Turn_Ended;
+
+        for (Turn turn : Turn.values()) {
+            if (turn.ordinal() == turnOrdinal) {
+                turno = turn;
+            }
+        }
+        return turno;
+    }
+
+    public void deserializeBoard(String board) {
+        int value;
+        int pos = 0;
+        for (int i = 0; i < board.length(); i++) {
+            if (board.charAt(i) != ',' && board.charAt(i) != '\n') {
+                value = Integer.parseInt(board.substring(i, i + 1));
+                bantumiVM.setNumSeeds(pos, value);
+                pos++;
+            }
+
+        }
+
+    }
+
+    public enum Turn {
+        turnJ1, turnJ2, Turn_Ended
+    }
+
 }
+

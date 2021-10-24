@@ -11,39 +11,48 @@ import es.upm.miw.bantumi.JuegoBantumi;
 
 public class BantumiViewModel extends ViewModel {
 
-    private ArrayList<MutableLiveData<Integer>> tablero;
+    private ArrayList<MutableLiveData<Integer>> board;
 
-    private MutableLiveData<JuegoBantumi.Turno> turno;
+    private MutableLiveData<JuegoBantumi.Turn> turn;
 
     public BantumiViewModel() {
-        turno = new MutableLiveData<>(JuegoBantumi.Turno.turnoJ1);
-        tablero = new ArrayList<>(JuegoBantumi.NUM_POSICIONES);
-        for (int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
-            tablero.add(i, new MutableLiveData<>(0));
+        turn = new MutableLiveData<>(JuegoBantumi.Turn.turnJ1);
+        board = new ArrayList<>(JuegoBantumi.NUM_POS);
+        for (int i = 0; i < JuegoBantumi.NUM_POS; i++) {
+            board.add(i, new MutableLiveData<>(0));
         }
     }
 
-    public LiveData<JuegoBantumi.Turno> getTurno() {
-        return turno;
+    public LiveData<JuegoBantumi.Turn> getTurn() {
+        return turn;
     }
 
-    public void setTurno(JuegoBantumi.Turno turno) {
-        this.turno.setValue(turno);
+    public void setTurn(JuegoBantumi.Turn turn) {
+        this.turn.setValue(turn);
     }
 
     @NonNull
-    public LiveData<Integer> getNumSemillas(int pos) {
-        if (pos < 0 || pos >= JuegoBantumi.NUM_POSICIONES) {
+    public LiveData<Integer> getNumSeeds(int pos) {
+        if (pos < 0 || pos >= JuegoBantumi.NUM_POS) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        return tablero.get(pos);
+        return board.get(pos);
     }
 
-    public void setNumSemillas(int pos, int v) {
-        if (pos < 0 || pos >= JuegoBantumi.NUM_POSICIONES) {
+    public void setNumSeeds(int pos, int v) {
+        if (pos < 0 || pos >= JuegoBantumi.NUM_POS) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        tablero.get(pos).setValue(v);
+        board.get(pos).setValue(v);
+    }
+
+    @NonNull
+    public String boardToString() {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < board.size(); i++) {
+            res.append(board.get(i).getValue()).append(",");
+        }
+        return res.toString();
     }
 }

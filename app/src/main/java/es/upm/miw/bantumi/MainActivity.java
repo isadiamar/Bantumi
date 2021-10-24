@@ -1,5 +1,6 @@
 package es.upm.miw.bantumi;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,31 +9,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Locale;
 
 import es.upm.miw.bantumi.model.BantumiViewModel;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String FILE_NAME = "BantumiGameData.txt";
     protected final String LOG_TAG = "MiW";
+    Button buttonReset;
     JuegoBantumi juegoBantumi;
     BantumiViewModel bantumiVM;
     int numInicialSemillas;
-    Button bttnReset;
 
     @Override
     public void onClick(View v) {
-        if (v.equals(bttnReset)) {
+        if (v.equals(buttonReset)) {
             new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
         }
+
     }
 
     @Override
@@ -42,48 +50,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         numInicialSemillas = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
-        juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turno.turnoJ1, numInicialSemillas);
-        crearObservadores();
+        juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turn.turnJ1, numInicialSemillas);
 
+        crearObservadores();
         reset();
     }
 
-    private void reset(){
-        bttnReset= findViewById(R.id.buttonReset);
-        bttnReset.setOnClickListener(this);
+    private void reset() {
+        buttonReset = findViewById(R.id.buttonReset);
+
+        buttonReset.setOnClickListener(this);
+
     }
 
-    /**
-     * Crea y subscribe los observadores asignados a las posiciones del tablero.
-     * Si se modifica el contenido del tablero, actualiza la vista.
-     */
     private void crearObservadores() {
-        for (int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+        for (int i = 0; i < JuegoBantumi.NUM_POS; i++) {
             int finalI = i;
-            bantumiVM.getNumSemillas(i).observe(    // Huecos y almacenes
+            bantumiVM.getNumSeeds(i).observe(    // Huecos y almacenes
                     this,
-                    numSemillas -> mostrarValor(finalI, juegoBantumi.getSemillas(finalI)));
+                    numSeeds -> mostrarValor(finalI, juegoBantumi.getSeeds(finalI)));
         }
-        bantumiVM.getTurno().observe(   // Turno
+        bantumiVM.getTurn().observe(   // Turno
                 this,
-                turno -> marcarTurno(juegoBantumi.turnoActual())
+                turn -> marcarTurno(juegoBantumi.currentTurn())
         );
     }
 
-    /**
-     * Indica el turno actual cambiando el color del texto
-     *
-     * @param turnoActual turno actual
-     */
-    private void marcarTurno(@NonNull JuegoBantumi.Turno turnoActual) {
+    private void marcarTurno(@NonNull JuegoBantumi.Turn turnoActual) {
         TextView tvJugador1 = findViewById(R.id.tvPlayer1);
         TextView tvJugador2 = findViewById(R.id.tvPlayer2);
         switch (turnoActual) {
-            case turnoJ1:
+            case turnJ1:
                 tvJugador1.setTextColor(getColor(R.color.blue_violet));
                 tvJugador2.setTextColor(getColor(R.color.black));
                 break;
-            case turnoJ2:
+            case turnJ2:
                 tvJugador1.setTextColor(getColor(R.color.black));
                 tvJugador2.setTextColor(getColor(R.color.pink_200));
                 break;
@@ -109,7 +110,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
         switch (item.getItemId()) {
 //            case R.id.opcAjustes: // @todo Preferencias
 //                startActivity(new Intent(this, BantumiPrefs.class));
@@ -122,7 +125,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .show();
                 return true;
 
-            // @TODO!!! resto opciones
+            case R.id.opcGuardarPartida:
+                save(findViewById(R.id.opcGuardarPartida));
+                return true;
+
+            case R.id.opcRecuperarPartida:
+                load(findViewById(R.id.opcRecuperarPartida));
+                return true;
 
             default:
                 Snackbar.make(
@@ -134,21 +143,73 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+    private void save(View v) {
+        String batumiSerialized = this.juegoBantumi.serializeGame();
+        FileOutputStream fos = null;
+
+        try {
+            fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            fos.write(batumiSerialized.getBytes());
+
+            Toast.makeText(MainActivity.this, "Saved ", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    private void load(View v) {
+        FileInputStream fis = null;
+
+        try {
+            fis = openFileInput(FILE_NAME);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String text;
+            while ((text = br.readLine()) != null) {
+                sb.append(text).append("\n");
+            }
+            juegoBantumi.deserializeGame(sb.toString());
+            Toast.makeText(MainActivity.this, "Load", Toast.LENGTH_SHORT).show();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert fis != null;
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
     public void huecoPulsado(@NonNull View v) {
         String resourceName = getResources().getResourceEntryName(v.getId()); // pXY
         int num = Integer.parseInt(resourceName.substring(resourceName.length() - 2));
         Log.i(LOG_TAG, "huecoPulsado(" + resourceName + ") num=" + num);
-        switch (juegoBantumi.turnoActual()) {
-            case turnoJ1:
-                juegoBantumi.jugar(num);
+        switch (juegoBantumi.currentTurn()) {
+            case turnJ1:
+                juegoBantumi.play(num);
                 break;
-            case turnoJ2:
+            case turnJ2:
                 juegaComputador();
                 break;
             default:    // JUEGO TERMINADO
                 finJuego();
         }
-        if (juegoBantumi.juegoTerminado()) {
+        if (juegoBantumi.gameIsEnded()) {
             finJuego();
         }
     }
@@ -158,22 +219,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Si mantiene turno -> vuelve a jugar
      */
     void juegaComputador() {
-        while (juegoBantumi.turnoActual() == JuegoBantumi.Turno.turnoJ2) {
+        while (juegoBantumi.currentTurn() == JuegoBantumi.Turn.turnJ2) {
             int pos = 7 + (int) (Math.random() * 6);    // posición aleatoria
             Log.i(LOG_TAG, "juegaComputador(), pos=" + pos);
-            if (juegoBantumi.getSemillas(pos) != 0 && (pos < 13)) {
-                juegoBantumi.jugar(pos);
+            if (juegoBantumi.getSeeds(pos) != 0 && (pos < 13)) {
+                juegoBantumi.play(pos);
             } else {
                 Log.i(LOG_TAG, "\t posición vacía");
             }
         }
     }
 
-    /**
-     * El juego ha terminado. Volver a jugar?
-     */
     private void finJuego() {
-        String texto = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
+        String texto = (juegoBantumi.getSeeds(6) > 6 * numInicialSemillas)
                 ? "Gana Jugador 1"
                 : "Gana Jugador 2";
         Snackbar.make(
@@ -181,10 +239,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 texto,
                 Snackbar.LENGTH_LONG
         )
-        .show();
+                .show();
 
         // @TODO guardar puntuación
         new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
     }
 
 }
+
