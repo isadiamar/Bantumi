@@ -2,6 +2,8 @@ package es.upm.miw.bantumi;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -30,10 +33,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String FILE_NAME = "BantumiGameData.txt";
     protected final String LOG_TAG = "MiW";
-    Button buttonReset;
+
     JuegoBantumi juegoBantumi;
     BantumiViewModel bantumiVM;
-    int numInicialSemillas;
+    int initialNumberSeeds;
+    Button buttonReset;
 
     @Override
     public void onClick(View v) {
@@ -48,35 +52,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        numInicialSemillas = getResources().getInteger(R.integer.intNumInicialSemillas);
+        initialNumberSeeds = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
-        juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turn.turnJ1, numInicialSemillas);
-
-        crearObservadores();
+        juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turn.turnJ1, initialNumberSeeds);
+        createObservers();
         reset();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String playerName = sharedPref.getString(
+                "name",
+                getString(R.string.prefTituloNombreJugador)
+        );
+
+        TextView player = findViewById(R.id.tvPlayer1);
+        player.setText(playerName);
+
+    }
+
+    public void editPreferences(View v) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void reset() {
         buttonReset = findViewById(R.id.buttonReset);
-
         buttonReset.setOnClickListener(this);
-
     }
 
-    private void crearObservadores() {
+    private void createObservers() {
         for (int i = 0; i < JuegoBantumi.NUM_POS; i++) {
             int finalI = i;
             bantumiVM.getNumSeeds(i).observe(    // Huecos y almacenes
                     this,
-                    numSeeds -> mostrarValor(finalI, juegoBantumi.getSeeds(finalI)));
+                    numSeeds -> showValue(finalI, juegoBantumi.getSeeds(finalI)));
         }
         bantumiVM.getTurn().observe(   // Turno
                 this,
-                turn -> marcarTurno(juegoBantumi.currentTurn())
+                turn -> highlightTurn(juegoBantumi.currentTurn())
         );
     }
 
-    private void marcarTurno(@NonNull JuegoBantumi.Turn turnoActual) {
+    private void highlightTurn(@NonNull JuegoBantumi.Turn turnoActual) {
         TextView tvJugador1 = findViewById(R.id.tvPlayer1);
         TextView tvJugador2 = findViewById(R.id.tvPlayer2);
         switch (turnoActual) {
@@ -94,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void mostrarValor(int pos, int valor) {
+    private void showValue(int pos, int valor) {
         String num2digitos = String.format(Locale.getDefault(), "%02d", pos);
         // Los identificadores de los huecos tienen el formato casilla_XX
         int idBoton = getResources().getIdentifier("casilla_" + num2digitos, "id", getPackageName());
@@ -133,6 +154,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 load(findViewById(R.id.opcRecuperarPartida));
                 return true;
 
+            case R.id.opcAjustes:
+                editPreferences(findViewById(R.id.opcAjustes));
+                return true;
+
             default:
                 Snackbar.make(
                         findViewById(android.R.id.content),
@@ -164,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
 
     private void load(View v) {
         FileInputStream fis = null;
@@ -204,13 +228,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 juegoBantumi.play(num);
                 break;
             case turnJ2:
-                juegaComputador();
+                playComputer();
                 break;
             default:    // JUEGO TERMINADO
-                finJuego();
+                endOfGame();
         }
         if (juegoBantumi.gameIsEnded()) {
-            finJuego();
+            endOfGame();
         }
     }
 
@@ -218,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Elige una posición aleatoria del campo del jugador2 y realiza la siembra
      * Si mantiene turno -> vuelve a jugar
      */
-    void juegaComputador() {
+    void playComputer() {
         while (juegoBantumi.currentTurn() == JuegoBantumi.Turn.turnJ2) {
             int pos = 7 + (int) (Math.random() * 6);    // posición aleatoria
             Log.i(LOG_TAG, "juegaComputador(), pos=" + pos);
@@ -230,8 +254,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void finJuego() {
-        String texto = (juegoBantumi.getSeeds(6) > 6 * numInicialSemillas)
+    private void endOfGame() {
+        String texto = (juegoBantumi.getSeeds(6) > 6 * initialNumberSeeds)
                 ? "Gana Jugador 1"
                 : "Gana Jugador 2";
         Snackbar.make(

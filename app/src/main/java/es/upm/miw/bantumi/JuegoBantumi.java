@@ -20,6 +20,7 @@ public class JuegoBantumi {
         }
     }
 
+
     public int getSeeds(int pos) {
         return bantumiVM.getNumSeeds(pos).getValue();
     }
@@ -82,14 +83,14 @@ public class JuegoBantumi {
             setSeeds(posContrario, 0);
         }
 
-        // Si es fin -> recolectar
+        // if end -> recolect
         if (emptyBox(Turn.turnJ1) || emptyBox(Turn.turnJ2)) {
-            recolectar(0);
-            recolectar(7);
+            recolect(0);
+            recolect(7);
             setTurn(Turn.Turn_Ended);
         }
 
-        // Determinar turno siguiente (si es depósito propio -> repite turno)
+        // // Determine next turn (if it is your own warehouse -> repeat turn)
         if (currentTurn() == Turn.turnJ1 && nextPos != 6)
             setTurn(Turn.turnJ2);
         else if (currentTurn() == Turn.turnJ2 && nextPos != 13)
@@ -102,22 +103,22 @@ public class JuegoBantumi {
     }
 
     private boolean emptyBox(Turn turn) {
-        boolean vacio = true;
-        int inicioCampo = (turn == Turn.turnJ1) ? 0 : 7;
-        for (int i = inicioCampo; i < inicioCampo + 6; i++)
-            vacio = vacio && (getSeeds(i) == 0);
+        boolean empty = true;
+        int initBox = (turn == Turn.turnJ1) ? 0 : 7;
+        for (int i = initBox; i < initBox + 6; i++)
+            empty = empty && (getSeeds(i) == 0);
 
-        return vacio;
+        return empty;
     }
 
-    private void recolectar(int pos) {
-        int semillasAlmacen = getSeeds(pos + 6);
+    private void recolect(int pos) {
+        int seedsStore = getSeeds(pos + 6);
         for (int i = pos; i < pos + 6; i++) {
-            semillasAlmacen += getSeeds(i);
+            seedsStore += getSeeds(i);
             setSeeds(i, 0);
         }
-        setSeeds(pos + 6, semillasAlmacen);
-        Log.i("MiW", "\tRecolectar - " + pos);
+        setSeeds(pos + 6, seedsStore);
+        Log.i("MiW", "\tRecolect - " + pos);
     }
 
     public Turn currentTurn() {

@@ -1,6 +1,5 @@
 package es.upm.miw.bantumi;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
