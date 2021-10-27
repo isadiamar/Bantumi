@@ -1,15 +1,19 @@
 package es.upm.miw.bantumi.views;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +37,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameVi
         return new GameViewHolder(itemView);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull GameViewHolder holder, int position) {
 
@@ -47,8 +52,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameVi
         } else {
             // Covers the case of data not being ready yet.
             Date today = Calendar.getInstance().getTime();
-
-            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy - hh:mm", Locale.getDefault());
             String formattedDate = df.format(today);
 
             holder.namePlayer.setText("Player");

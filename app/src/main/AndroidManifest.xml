@@ -20,13 +20,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/preferencesText">
 
         </activity>
 
         <activity
-            android:name=".BestGameResultsActivity"
+            android:name=".activities.BestGameResultsActivity"
             android:label="@string/txtOpcionMejoresResultados">
 
         </activity>

@@ -170,14 +170,15 @@ public class JuegoBantumi {
         int value;
         int pos = 0;
 
-        for (int i = 0; i < board.length(); i++) {
-            if (board.charAt(i) != ',' && board.charAt(i) != '\n') {
-                value = Integer.parseInt(board.substring(i, i + 1));
+        for(String str : board.split(",")){
+            if(!str.equals("\n")){
+                value = Integer.parseInt(str);
                 bantumiVM.setNumSeeds(pos, value);
                 pos++;
             }
         }
     }
+
 
     public enum Turn {
         turnJ1, turnJ2, Turn_Ended

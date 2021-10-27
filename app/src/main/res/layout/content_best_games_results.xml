@@ -4,7 +4,7 @@
     android:id="@+id/content_best_games_results"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BestGameResultsActivity"
+    tools:context=".activities.BestGameResultsActivity"
     tools:showIn="@layout/content_best_games_results">
 
     <androidx.recyclerview.widget.RecyclerView

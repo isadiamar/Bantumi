@@ -1,9 +1,11 @@
-package es.upm.miw.bantumi;
+package es.upm.miw.bantumi.activities;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
+
+import es.upm.miw.bantumi.R;
 
 public class SettingsActivity extends AppCompatActivity {
     @Override

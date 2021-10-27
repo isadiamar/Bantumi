@@ -21,7 +21,7 @@ public class GameRepository {
         return game;
     }
 
-    public long insertGame(Game game) {
+    public long insert(Game game) {
         return gameDAO.insert(game);
     }
 

@@ -30,6 +30,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import es.upm.miw.bantumi.activities.BestGameResultsActivity;
+import es.upm.miw.bantumi.activities.SettingsActivity;
+import es.upm.miw.bantumi.dialogs.FinalAlertDialog;
+import es.upm.miw.bantumi.dialogs.ReloadGameAlertDialog;
 import es.upm.miw.bantumi.model.Bantumi.BantumiViewModel;
 import es.upm.miw.bantumi.model.Room.Game;
 import es.upm.miw.bantumi.model.Room.GameViewModel;
@@ -38,8 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String FILE_NAME = "BantumiGameData.txt";
     protected final String LOG_TAG = "MiW";
-
-    JuegoBantumi juegoBantumi;
+    public JuegoBantumi juegoBantumi;
     BantumiViewModel bantumiVM;
 
     int initialNumberSeeds;
@@ -155,7 +158,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
 
             case R.id.opcRecuperarPartida:
-                load(findViewById(R.id.opcRecuperarPartida));
+                String file = getGameFile();
+                if (isGameNotSaved(file)){
+                    new ReloadGameAlertDialog().show(getSupportFragmentManager(), "RELOAD_DIALOG");
+                }else{
+                    loadGame(findViewById(R.id.opcRecuperarPartida));
+                }
                 return true;
 
             case R.id.opcAjustes:
@@ -202,10 +210,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void load(View v) {
-        FileInputStream fis = null;
+    public void loadGame(View v) {
+        load();
+    }
 
-        //si se hubiera modificado la partida actual, se solicitará confirmación
+    public void load(){
+        String file = getGameFile();
+        deserializeGame(file);
+    }
+
+    public void deserializeGame(String serializeGame){
+        juegoBantumi.deserializeGame(serializeGame);
+        Toast.makeText(MainActivity.this, "Load", Toast.LENGTH_SHORT).show();
+    }
+
+    private String getGameFile(){
+        FileInputStream fis = null;
+        String fileData = "";
         try {
             fis = openFileInput(FILE_NAME);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -215,9 +236,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             while ((text = br.readLine()) != null) {
                 sb.append(text).append("\n");
             }
-            juegoBantumi.deserializeGame(sb.toString());
-            Toast.makeText(MainActivity.this, "Load", Toast.LENGTH_SHORT).show();
 
+            fileData = sb.toString();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -229,6 +249,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
+
+        return fileData;
+    }
+
+    private boolean isGameNotSaved( String actualFile){
+        boolean res = false;
+        if (!this.juegoBantumi.serializeGame().equals(actualFile)){
+            res = true;
+        }
+        return res;
     }
 
     private void reset() {
@@ -284,14 +314,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void saveDataGame() {
 
-        int storeWinner;
-
-        if (juegoBantumi.getSeeds(Constants.PLAYER_STORE) > 6 * Constants.PLAYER_STORE) {
-            storeWinner = this.juegoBantumi.getSeeds(Constants.PLAYER_STORE);
-        } else {
-            storeWinner = this.juegoBantumi.getSeeds(Constants.CPU_STORE);
-        }
-
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String namePlayer = sharedPref.getString(
                 "name",
@@ -301,12 +323,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int numberTokenLeft = this.juegoBantumi.numTokensLeft();
         int storePlayer = this.juegoBantumi.getSeeds(Constants.PLAYER_STORE);
         int storeCPU = this.juegoBantumi.getSeeds(Constants.CPU_STORE);
+        int storeWinner = Math.max(storePlayer, storeCPU);
 
         Date today = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy - hh:mm", Locale.getDefault());
         String formattedDate = df.format(today);
 
-        this.gameViewModel.insertGame(
+        this.gameViewModel.insert(
                 new Game(namePlayer, formattedDate,
                         numberTokenLeft, storeCPU, storePlayer, storeWinner)
         );
