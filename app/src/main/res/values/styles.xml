@@ -13,7 +13,7 @@
         <item name="android:maxLines">1</item>
         <item name="android:padding">0dp</item>
         <!--  Asocia la acción al pulsar sobre un hueco -->
-        <item name="android:onClick">huecoPulsado</item>
+        <item name="android:onClick">pressedButton</item>
     </style>
 
 </resources>

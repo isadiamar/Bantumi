@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
@@ -25,9 +26,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
-import es.upm.miw.bantumi.model.BantumiViewModel;
+import es.upm.miw.bantumi.model.Bantumi.BantumiViewModel;
+import es.upm.miw.bantumi.model.Room.Game;
+import es.upm.miw.bantumi.model.Room.GameViewModel;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -36,8 +42,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     JuegoBantumi juegoBantumi;
     BantumiViewModel bantumiVM;
+
     int initialNumberSeeds;
     Button buttonReset;
+
+    GameViewModel gameViewModel;
 
     @Override
     public void onClick(View v) {
@@ -55,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initialNumberSeeds = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
         juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turn.turnJ1, initialNumberSeeds);
+
+        gameViewModel = new GameViewModel(getApplication());
 
         createObservers();
         reset();
@@ -78,11 +89,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void editPreferences(View v) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
-    }
-
-    private void reset() {
-        buttonReset = findViewById(R.id.buttonReset);
-        buttonReset.setOnClickListener(this);
     }
 
     private void createObservers() {
@@ -161,6 +167,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
                 return true;
 
+            case R.id.opcMejoresResultados:
+                startActivity(new Intent(this, BestGameResultsActivity.class));
+                return true;
+
             default:
                 Snackbar.make(
                         findViewById(android.R.id.content),
@@ -196,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void load(View v) {
         FileInputStream fis = null;
 
+        //si se hubiera modificado la partida actual, se solicitará confirmación
         try {
             fis = openFileInput(FILE_NAME);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -218,11 +229,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
     }
 
-    public void huecoPulsado(@NonNull View v) {
+    private void reset() {
+        buttonReset = findViewById(R.id.buttonReset);
+        buttonReset.setOnClickListener(this);
+    }
+
+    public void pressedButton(@NonNull View v) {
         String resourceName = getResources().getResourceEntryName(v.getId()); // pXY
         int num = Integer.parseInt(resourceName.substring(resourceName.length() - 2));
         Log.i(LOG_TAG, "huecoPulsado(" + resourceName + ") num=" + num);
@@ -243,9 +258,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void playComputer() {
         while (juegoBantumi.currentTurn() == JuegoBantumi.Turn.turnJ2) {
-            int pos = 7 + (int) (Math.random() * 6);    // pos random
+            int pos = 7 + (int) (Math.random() * Constants.PLAYER_STORE);    // pos random
             Log.i(LOG_TAG, "playComputer(), pos=" + pos);
-            if (juegoBantumi.getSeeds(pos) != 0 && (pos < 13)) {
+            if (juegoBantumi.getSeeds(pos) != 0 && (pos < Constants.CPU_STORE)) {
                 juegoBantumi.play(pos);
             } else {
                 Log.i(LOG_TAG, "\t empty position");
@@ -254,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void endOfGame() {
-        String texto = (juegoBantumi.getSeeds(6) > 6 * initialNumberSeeds)
+        String texto = (juegoBantumi.getSeeds(Constants.PLAYER_STORE) > 6 * Constants.PLAYER_STORE)
                 ? "Gana Jugador 1"
                 : "Gana Jugador 2";
         Snackbar.make(
@@ -264,8 +279,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         )
                 .show();
 
-        // @TODO guardar puntuación
+        saveDataGame();
         new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
+    }
+
+    void saveDataGame(){
+
+        int storeWinner = 0;
+
+        if(juegoBantumi.getSeeds(Constants.PLAYER_STORE) > 6 * Constants.PLAYER_STORE) {
+            storeWinner = this.juegoBantumi.getSeeds(Constants.PLAYER_STORE);
+        }else {
+            storeWinner = this.juegoBantumi.getSeeds(Constants.CPU_STORE);
+        }
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String namePlayer = sharedPref.getString(
+                "name",
+                getString(R.string.prefTituloNombreJugador)
+        );
+
+        int numberTokenLeft = this.juegoBantumi.numTokensLeft();
+        int storePlayer  = this.juegoBantumi.getSeeds(Constants.PLAYER_STORE);
+        int storeCPU = this.juegoBantumi.getSeeds(Constants.CPU_STORE);
+
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        String formattedDate = df.format(today);
+
+        this.gameViewModel.insertGame(
+                new Game(namePlayer, formattedDate,
+                        numberTokenLeft, storeCPU, storePlayer, storeWinner)
+        );
+
     }
 
 }

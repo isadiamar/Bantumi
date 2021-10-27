@@ -157,4 +157,5 @@
         android:padding="15dp"
         android:text="@string/txtBtnReset"
         android:textColor="@color/white" />
+
 </RelativeLayout>

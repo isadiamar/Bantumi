@@ -10,7 +10,10 @@
     <color name="orange">#FF9800</color>
     <color name="orange_dark">#FB8C00</color>
     <color name="pink">#DF79B6</color>
-    <color name="violet">#8D53AA</color>
-    <color name="blue_violet">#9080F7</color>
     <color name="pink_200">#BA6A9A</color>
+    <color name="violet">#8D53AA</color>
+    <color name="violet_200">#604E81</color>
+    <color name="blue_violet">#9080F7</color>
+    <color name="blue_violet_200">#B8B8FF</color>
+    <color name="blue_violet_300">#7A6AD3</color>
 </resources>

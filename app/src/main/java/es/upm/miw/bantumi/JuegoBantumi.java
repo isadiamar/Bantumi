@@ -2,7 +2,7 @@ package es.upm.miw.bantumi;
 
 import android.util.Log;
 
-import es.upm.miw.bantumi.model.BantumiViewModel;
+import es.upm.miw.bantumi.model.Bantumi.BantumiViewModel;
 
 
 public class JuegoBantumi {
@@ -99,6 +99,20 @@ public class JuegoBantumi {
 
     public boolean gameIsEnded() {
         return (currentTurn() == Turn.Turn_Ended);
+    }
+
+    public int numTokensLeft() {
+        int res = 0;
+        int pos;
+        for (int i = 0; i < JuegoBantumi.NUM_POS; i++) {
+            pos = i;
+            if (pos == 6 || pos == 13) {
+                res = res + 0;
+            } else {
+                res = res + this.getSeeds(i);
+            }
+        }
+        return res;
     }
 
     private boolean emptyBox(Turn turn) {

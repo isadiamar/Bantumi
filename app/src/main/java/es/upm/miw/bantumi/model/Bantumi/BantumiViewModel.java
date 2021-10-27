@@ -1,4 +1,4 @@
-package es.upm.miw.bantumi.model;
+package es.upm.miw.bantumi.model.Bantumi;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -46,6 +46,8 @@ public class BantumiViewModel extends ViewModel {
         }
         board.get(pos).setValue(v);
     }
+
+
 
     @NonNull
     public String boardToString() {

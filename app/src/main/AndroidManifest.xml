@@ -21,7 +21,16 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/preferencesText"></activity>
+            android:label="@string/preferencesText" >
+
+        </activity>
+
+        <activity
+            android:name=".BestGameResultsActivity"
+            android:label="@string/txtOpcionMejoresResultados" >
+
+        </activity>
+
     </application>
 
 </manifest>

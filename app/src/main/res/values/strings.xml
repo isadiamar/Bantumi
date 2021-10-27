@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Bantumi</string>
-
     <string name="txtPlayer1">Player 1</string>
     <string name="txtPlayer2">Player 2</string>
     <string name="txtBtnReset">Reset</string>
@@ -48,5 +47,7 @@
     <string name="txtDialogoFinalPregunta">¿Desea jugar otra partida?</string>
     <string name="txtDialogoFinalAfirmativo">Sí</string>
     <string name="txtDialogoFinalNegativo">No</string>
+    <string name="tokens">Tokens</string>
+    <string name="cpu">CPU</string>
 
 </resources>
