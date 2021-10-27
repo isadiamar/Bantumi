@@ -16,12 +16,8 @@ public abstract class GameRoomDatabase extends RoomDatabase {
 
     public static final String DATABASE = Game.TABLA + ".db";
     private static final int NUMBER_OF_THREADS = 4;
-
-    public abstract GameDAO gameDAO();
-
     static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-
     private static volatile GameRoomDatabase INSTANCE;
     // Delete all content and repopulate the database whenever the app is started
     private static RoomDatabase.Callback sRoomDatabaseCallback =
@@ -30,11 +26,8 @@ public abstract class GameRoomDatabase extends RoomDatabase {
                 @Override
                 public void onOpen(@NonNull SupportSQLiteDatabase db) {
                     super.onOpen(db);
-                    databaseWriteExecutor.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            GameDAO dao = INSTANCE.gameDAO();
-                        }
+                    databaseWriteExecutor.execute(() -> {
+                        GameDAO dao = INSTANCE.gameDAO();
                     });
                 }
             };
@@ -54,5 +47,7 @@ public abstract class GameRoomDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
+
+    public abstract GameDAO gameDAO();
 
 }

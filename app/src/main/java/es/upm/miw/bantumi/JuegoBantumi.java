@@ -106,9 +106,7 @@ public class JuegoBantumi {
         int pos;
         for (int i = 0; i < JuegoBantumi.NUM_POS; i++) {
             pos = i;
-            if (pos == 6 || pos == 13) {
-                res = res + 0;
-            } else {
+            if (pos != Constants.PLAYER_STORE && pos != Constants.CPU_STORE) {
                 res = res + this.getSeeds(i);
             }
         }
@@ -125,12 +123,12 @@ public class JuegoBantumi {
     }
 
     private void recolect(int pos) {
-        int seedsStore = getSeeds(pos + 6);
-        for (int i = pos; i < pos + 6; i++) {
+        int seedsStore = getSeeds(pos + Constants.PLAYER_STORE);
+        for (int i = pos; i < pos + Constants.PLAYER_STORE; i++) {
             seedsStore += getSeeds(i);
             setSeeds(i, 0);
         }
-        setSeeds(pos + 6, seedsStore);
+        setSeeds(pos + Constants.PLAYER_STORE, seedsStore);
         Log.i("MiW", "\tRecolect - " + pos);
     }
 

@@ -48,7 +48,6 @@ public class BantumiViewModel extends ViewModel {
     }
 
 
-
     @NonNull
     public String boardToString() {
         StringBuilder res = new StringBuilder();

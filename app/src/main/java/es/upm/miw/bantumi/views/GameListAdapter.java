@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,29 +20,8 @@ import es.upm.miw.bantumi.model.Room.Game;
 
 public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameViewHolder> {
 
-    static class GameViewHolder extends RecyclerView.ViewHolder {
-
-        private final TextView namePlayer;
-        private final TextView date;
-        private final TextView numberTokenLeft;
-        private final TextView storePlayer;
-        private final TextView storeCPU;
-
-        private GameViewHolder(View itemView) {
-            super(itemView);
-            namePlayer = itemView.findViewById(R.id.etNamePlayer) ;
-            date =  itemView.findViewById(R.id.etDateGame);
-            numberTokenLeft = itemView.findViewById(R.id.etTokensLeft);
-            storePlayer = itemView.findViewById(R.id.etScorePlayer);
-            storeCPU = itemView.findViewById(R.id.etScoreCPU);
-        }
-
-    }
-
-
     private final LayoutInflater inflater;
     private List<Game> games;
-
     public GameListAdapter(Context context) {
         this.inflater = LayoutInflater.from(context);
     }
@@ -82,7 +60,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameVi
         }
     }
 
-    public void setGames(List<Game> games){
+    public void setGames(List<Game> games) {
         this.games = games;
         notifyDataSetChanged();
     }
@@ -94,8 +72,27 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameVi
                 : this.games.size();
     }
 
-    public Game getGamePosition (int position) {
+    public Game getGamePosition(int position) {
         return this.games.get(position);
+    }
+
+    static class GameViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView namePlayer;
+        private final TextView date;
+        private final TextView numberTokenLeft;
+        private final TextView storePlayer;
+        private final TextView storeCPU;
+
+        private GameViewHolder(View itemView) {
+            super(itemView);
+            namePlayer = itemView.findViewById(R.id.etNamePlayer);
+            date = itemView.findViewById(R.id.etDateGame);
+            numberTokenLeft = itemView.findViewById(R.id.etTokensLeft);
+            storePlayer = itemView.findViewById(R.id.etScorePlayer);
+            storeCPU = itemView.findViewById(R.id.etScoreCPU);
+        }
+
     }
 
 }

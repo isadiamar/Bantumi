@@ -15,7 +15,7 @@ import es.upm.miw.bantumi.views.GameListAdapter;
 
 public class BestGameResultsActivity extends AppCompatActivity {
 
-   GameViewModel gameViewModel;
+    GameViewModel gameViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +32,6 @@ public class BestGameResultsActivity extends AppCompatActivity {
 
         gameViewModel = new GameViewModel(getApplication());
 
-        gameViewModel.getAllGames().observe(this, new Observer<List<Game>>() {
-            @Override
-            public void onChanged(List<Game> games) {
-                adapter.setGames(games);
-            }
-        });
+        gameViewModel.getAllGames().observe(this, adapter::setGames);
     }
 }

@@ -3,8 +3,6 @@ package es.upm.miw.bantumi.model.Room;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.util.Date;
-
 @Entity(tableName = Game.TABLA)
 public class Game {
 

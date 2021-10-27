@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
@@ -283,13 +282,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
     }
 
-    void saveDataGame(){
+    void saveDataGame() {
 
-        int storeWinner = 0;
+        int storeWinner;
 
-        if(juegoBantumi.getSeeds(Constants.PLAYER_STORE) > 6 * Constants.PLAYER_STORE) {
+        if (juegoBantumi.getSeeds(Constants.PLAYER_STORE) > 6 * Constants.PLAYER_STORE) {
             storeWinner = this.juegoBantumi.getSeeds(Constants.PLAYER_STORE);
-        }else {
+        } else {
             storeWinner = this.juegoBantumi.getSeeds(Constants.CPU_STORE);
         }
 
@@ -300,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         );
 
         int numberTokenLeft = this.juegoBantumi.numTokensLeft();
-        int storePlayer  = this.juegoBantumi.getSeeds(Constants.PLAYER_STORE);
+        int storePlayer = this.juegoBantumi.getSeeds(Constants.PLAYER_STORE);
         int storeCPU = this.juegoBantumi.getSeeds(Constants.CPU_STORE);
 
         Date today = Calendar.getInstance().getTime();
